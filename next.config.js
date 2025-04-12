@@ -24,6 +24,12 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["bcryptjs"],
   },
+  server: {
+    // Fixes "Socket already assigned" error
+    compression: false,
+    maxHeaderSize: 16384, // 16KB
+    keepAliveTimeout: 60000, // 60 seconds
+  },
 };
 
 module.exports = nextConfig;

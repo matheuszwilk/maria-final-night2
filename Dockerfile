@@ -28,7 +28,10 @@ FROM oven/bun:1-slim AS runner
 # Configuração das variáveis de ambiente
 ENV NODE_ENV=production
 ENV PORT=3001
+# Ensure AUTH_SECRET is properly set with explicit value
 ENV AUTH_SECRET=$AUTH_SECRET
+# Add NEXTAUTH_URL for proper authentication in production
+ENV NEXTAUTH_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$APP_URL
 ENV AUTH_TRUST_HOST=true
 ENV DATABASE_URL=$DATABASE_URL
@@ -44,6 +47,10 @@ ENV TZ=America/Sao_Paulo
 RUN apt-get update && apt-get install -y --no-install-recommends tzdata \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install DNS tools for debugging
+RUN apt-get update && apt-get install -y --no-install-recommends dnsutils iputils-ping \
     && rm -rf /var/lib/apt/lists/*
 
 # Define o diretório de trabalho

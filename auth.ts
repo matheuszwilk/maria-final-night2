@@ -19,6 +19,17 @@ export const {
     signIn: "/auth/login",
     error: "/auth/error",
   },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   events: {
     async linkAccount({ user }) {
       await db.user.update({

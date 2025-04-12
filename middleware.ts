@@ -11,6 +11,7 @@ import {
 const { auth } = NextAuth({
   ...authConfig,
   trustHost: true,
+  debug: process.env.NODE_ENV === "development", // Enable debug logs in development
 });
 
 export default auth((req) => {
