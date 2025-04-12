@@ -1,0 +1,26 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { PlusIcon } from "lucide-react";
+
+import { useState } from "react";
+import CreateTargetDialogContent from "./create-dialog-content";
+
+const CreateTargetButton = () => {
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+
+  return (
+    <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen}>
+      <DialogTrigger asChild>
+        <Button className="gap-2" variant="secondary">
+          <PlusIcon size={20} />
+          New Target
+        </Button>
+      </DialogTrigger>
+      <CreateTargetDialogContent setDialogIsOpen={setDialogIsOpen} />
+    </Dialog>
+  );
+};
+
+export default CreateTargetButton;

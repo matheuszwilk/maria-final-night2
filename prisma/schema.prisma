@@ -1,0 +1,298 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  name                  String?
+  email                 String?                @unique
+  emailVerified         DateTime?
+  image                 String?
+  password              String?
+  role                  UserRole               @default(USER)
+  isTwoFactorEnabled    Boolean                @default(false)
+  accounts              Account[]
+  twoFactorConfirmation TwoFactorConfirmation?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorConfirmation {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model andon {
+  id               String    @id @default(uuid()) @db.Char(36)
+  no               Int?
+  chk              String?   @db.Text
+  status           String?   @db.Text
+  equipment_line   String?   @db.VarChar(255)
+  andon_process    String?   @db.Text
+  andon_no         Int?
+  main_sub         String?   @db.Text
+  start            DateTime? @db.Timestamp(0)
+  end              DateTime? @db.Timestamp(0)
+  run_time_hms     String?   @db.Text
+  run_time_sec     Int?
+  warning_stop     String?   @db.Text
+  andon_type       String?   @db.Text
+  cause_department String?   @db.Text
+  reason           String?   @db.Text
+  andon_time       Int?
+  organization     String?   @db.VarChar(255)
+
+  @@index([equipment_line], map: "idx_equipment_line")
+}
+
+model idle {
+  id                   String    @id @default(uuid()) @db.Char(36)
+  organization         String?   @db.Text
+  date                 DateTime? @db.Date
+  line                 String?   @db.Text
+  start_time           String?   @db.Text
+  end_time             String?   @db.Text
+  idle_time            Int?
+  head_count           Float?
+  man_hour             Float?
+  primary_cause_dept   String?   @db.Text
+  secondary_cause_dept String?   @db.Text
+  work_order           String?   @db.Text
+  model                String?   @db.Text
+  idle_rework_code_1   String?   @db.Text
+  idle_rework_code_2   String?   @db.Text
+  idle_rework_code_3   String?   @db.Text
+  idle_rework_code_4   String?   @db.Text
+  idle_rework_code     String?   @db.Text
+  part_no              String?   @db.Text
+  vendor               Float?
+  contents             String?   @db.LongText
+  action_content       String?   @db.Text
+  cause_process        Float?
+  update_user          String?   @db.Text
+  update_date          String?   @db.Text
+  source_of_data_input String?   @db.Text
+  real_line            String?   @db.Text
+}
+
+model andon_monthly_top_defects {
+  id                   String    @id @db.VarChar(36)
+  year_month           String?   @db.VarChar(7)
+  andon_process        String?   @db.VarChar(50)
+  organization         String?   @db.VarChar(50)
+  equipment_line       String?   @db.VarChar(50)
+  reason               String?   @db.VarChar(200)
+  end_date             DateTime? @db.DateTime(0)
+  cause_department     String?   @db.VarChar(50)
+  andon_time           Int?
+  createdAt            DateTime? @default(now()) @db.DateTime(0)
+  status               String?   @db.Char(2)
+  action_plan_file_url String?   @db.Text
+}
+
+model idle_monthly_top_defects {
+  id                   String    @id @db.VarChar(36)
+  year_month           String?   @db.VarChar(7)
+  date                 DateTime? @db.Date
+  idle_rework_code_4   String?   @db.VarChar(50)
+  organization         String?   @db.VarChar(50)
+  line                 String?   @db.VarChar(50)
+  model                String?   @db.VarChar(50)
+  contents             String?   @db.VarChar(3000)
+  end_date             DateTime? @db.DateTime(0)
+  secondary_cause_dept String?   @db.VarChar(50)
+  idle_time            Int?
+  createdAt            DateTime? @default(now()) @db.DateTime(0)
+  status               String?   @db.Char(2)
+  action_plan_file_url String?   @db.Text
+}
+
+model manhour {
+  id                           String    @id @default(uuid())
+  organization                 String?
+  line                         String?
+  shift                        String?
+  work_part                    String?
+  work_date                    DateTime? @db.Date
+  model_or_model_suffix        String?
+  total_working_time           Float?
+  net_working_time             Float?
+  production_quantity          Int?
+  uph                          Float?
+  yield_man_hour               Float?
+  total_attendance_man_hour    Float?
+  direct_man_hour              Float?
+  indirect_man_hour            Float?
+  idle_man_hour                Float?
+  controllable_idle_man_hour   Float?
+  uncontrollable_idle_man_hour Float?
+  rework_man_hour              Float?
+  net_working_man_hour         Float?
+  direct_on_operation          Int?
+  indirect_on_operation        Int?
+  total_on_operation           Int?
+}
+
+model scheduler_log {
+  id         Int       @id @default(autoincrement())
+  job_name   String    @db.VarChar(255)
+  last_run   DateTime?
+  next_run   DateTime?
+  status     String?   @db.VarChar(50)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@index([job_name], map: "idx_scheduler_job_name")
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Email {
+  id           String   @id @default(uuid())
+  email        String
+  organization String
+  department   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model target {
+  id           String   @id @default(uuid())
+  projectName  String   @db.VarChar(5)
+  organization String   @db.VarChar(3)
+  line         String   @db.VarChar(14)
+  year         String   @db.VarChar(4)
+  target       Float    @db.Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model tasks {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  name        String   @db.VarChar(255)
+  assigneeId  String   @db.VarChar(36)
+  dueDate     String   @db.VarChar(50)
+  description String?  @db.Text
+  workspaceId String   @db.VarChar(36)
+  position    Int      @default(1000)
+  projectId   String   @db.VarChar(36)
+  status      Status   @default(BACKLOG)
+  fileUrl     String?  @db.Text
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
+}
+
+model projects {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  name        String   @db.VarChar(255)
+  imageUrl    String?  @db.Text
+  workspaceId String   @db.VarChar(36)
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
+}
+
+model members {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  userId      String   @db.VarChar(36)
+  workspaceId String   @db.VarChar(36)
+  role        Role     @default(MEMBER)
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+}
+
+model workspaces {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  name       String   @db.VarChar(255)
+  imageUrl   String?  @db.Text
+  inviteCode String   @db.VarChar(36)
+  userId     String   @db.VarChar(36)
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @updatedAt @db.Timestamp(6)
+}
+
+model unique_org_line {
+  id             String  @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  organization   String  @db.VarChar(255)
+  line           String? @db.VarChar(10)
+  equipment_line String? @db.VarChar(255)
+
+  @@unique([organization, equipment_line], map: "unique_combo")
+  @@index([equipment_line], map: "idx_equipment_line_uol")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+enum Status {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+  DROPPED
+}

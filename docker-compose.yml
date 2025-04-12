@@ -1,0 +1,22 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3001:3000"
+    environment:
+      TZ: America/Sao_Paulo
+      AUTH_SECRET: "adokpsadisfaijsfijoasoijfaoijsoijf1192824214h12h4912uy981c8b89c49c97419714"
+      NODE_ENV: "production"
+      NEXT_PUBLIC_APP_URL: "http://10.193.236.56:3001"
+      AUTH_TRUST_HOST: "true"
+      DATABASE_URL: postgres://postgres:bh2ksv5y@10.193.236.56:5432/serverdb
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: 8cE6emMmFITeEqRkAiO2
+      MINIO_SECRET_KEY: 8dB5QAQU1L3nrfsnncztltsZQvL8bOtmwyG3nwrT
+      MINIO_PORT: 9000
+      MINIO_SERVER_URL: 10.193.236.56
+      MINIO_BUCKET: aws-f6
+      RESEND_KEY: "lgekrhqmh01.lge.com"
+    volumes:
+      - .:/app # Para desenvolvimento, opcionalmente
+    restart: unless-stopped
